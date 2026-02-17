@@ -1,0 +1,1 @@
+# cors is used for connecting backend with the frontend
