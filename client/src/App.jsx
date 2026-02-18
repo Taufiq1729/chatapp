@@ -15,7 +15,7 @@ function App() {
   return (
     <ChatContextProvider user = {user}>
     <NavBar />
-    <Container className="text-secondary">
+    <Container className="app-main">
       <Routes>
         <Route path="/" element={user ? <Chat /> : <Login/>} />
         <Route path="/register" element={user ? <Chat /> : <Register /> } />

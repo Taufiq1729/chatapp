@@ -199,5 +199,48 @@ const getUsers = async (req, res) => {
 };
 
 
+const deleteUser = async (req, res) => {
+    try {
+        const userId = req.params.userId;
 
-module.exports = { registerUser, loginUser, findUser, getUsers };
+        if (!userId) {
+            return res.status(400).json({
+                success: false,
+                message: "User ID is required"
+            });
+        }
+
+        const user = await userModel.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        const Chat = require("../Models/chatModel");
+        const Message = require("../Models/messageModel");
+
+        const chats = await Chat.find({ members: userId });
+        const chatIds = chats.map((c) => c._id);
+
+        await Message.deleteMany({ chat: { $in: chatIds } });
+        await Chat.deleteMany({ members: userId });
+        await userModel.findByIdAndDelete(userId);
+
+        res.status(200).json({
+            success: true,
+            message: "User deleted successfully"
+        });
+
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: error.message
+        });
+    }
+};
+
+
+module.exports = { registerUser, loginUser, findUser, getUsers, deleteUser };

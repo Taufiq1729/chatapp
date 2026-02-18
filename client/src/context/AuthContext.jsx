@@ -55,11 +55,12 @@ export const AuthContextProvider = ({ children }) =>{
     console.log("registerInfo", registerInfo);
     console.log("User", user);
 
-    useEffect(() =>{
+    useEffect(() => {
         const storedUser = localStorage.getItem("User");
         if (storedUser) {
             try {
-                setUser(JSON.parse(storedUser));
+                const parsed = JSON.parse(storedUser);
+                setUser({ ...parsed, _id: parsed._id || parsed.id });
             } catch {
                 setUser(null);
             }
@@ -88,15 +89,12 @@ export const AuthContextProvider = ({ children }) =>{
             return;
         }
 
-        const authUser = response.user || response;
+        const raw = response.user || response;
+        const authUser = { ...raw, _id: raw._id || raw.id };
 
-        // Save user in state
         setUser(authUser);
-
-        // Save user in localStorage (optional but recommended)
         localStorage.setItem("User", JSON.stringify(authUser));
 
-        // Optionally persist token for authenticated requests
         if (response.token) {
             localStorage.setItem("Token", response.token);
         }
@@ -116,7 +114,8 @@ export const AuthContextProvider = ({ children }) =>{
             return;
         }
 
-        const authUser = response.user || response;
+        const raw = response.user || response;
+        const authUser = { ...raw, _id: raw._id || raw.id };
 
         setUser(authUser);
         localStorage.setItem("User", JSON.stringify(authUser));
